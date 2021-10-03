@@ -6,8 +6,17 @@ spring:
       uri: http://localhost:8888
   profiles:
     active: dev
-
-
+  mail:
+    properties:
+      mail:
+        smtp:
+          starttls:
+            enable: 'true'
+          auth: 'true'
+    host: smtp.office365.com
+    username: nttuan@vtsign.tech
+    password: Han74824
+    port: '587'
 
 server:
   port: 8200
