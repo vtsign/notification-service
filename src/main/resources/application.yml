@@ -3,20 +3,7 @@ spring:
     name: notification-service
   cloud:
     config:
-      uri: http://localhost:8888
-  profiles:
-    active: dev
-  mail:
-    properties:
-      mail:
-        smtp:
-          starttls:
-            enable: 'true'
-          auth: 'true'
-    host: smtp.office365.com
-    username: nttuan@vtsign.tech
-    password: Han74824
-    port: '587'
+      uri: http://vtsign.tech:8888
 
 server:
   port: 8200
