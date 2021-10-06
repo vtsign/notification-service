@@ -1,5 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <title>VTSign - Welcome</title>
@@ -11,7 +11,7 @@
                 body[yahoo] .button a { background-color: #1bbae1; padding: 15px 25px !important; }
             }
 
-            @media only screen and (min-device-width: 601px) {
+            @media only screen and (min-device-width:   601px) {
                 .content { width: 600px !important; }
                 .col387 { width: 387px !important; }
             }
@@ -51,7 +51,7 @@
                     <table bgcolor="#1bbae1" border="0" cellspacing="0" cellpadding="0" class="buttonwrapper">
                         <tr>
                             <td align="center" style="padding: 25px 0" class="button">
-                                <a href="${activationLink}" style=" padding: 10px 15px; font-family: Arial, sans-serif; font-size: 16px; font-weight: bold; color: #ffffff; text-align: center; text-decoration: none; " >Activate Account</a >
+                                <a th:href="${activationLink}"  style=" padding: 10px 15px; font-family: Arial, sans-serif; font-size: 16px; font-weight: bold; color: #ffffff; text-align: center; text-decoration: none; " >Activate Account</a >
                             </td>
                         </tr>
                     </table>

@@ -8,6 +8,7 @@ import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.handler.annotation.Headers;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
+import tech.vtsign.notificationservice.model.HtmlTemplate;
 import tech.vtsign.notificationservice.model.Mail;
 import tech.vtsign.notificationservice.model.User;
 import tech.vtsign.notificationservice.service.ConsumerService;
@@ -35,7 +36,7 @@ public class ConsumerServiceImpl implements ConsumerService {
         Mail mail = Mail.builder()
                 .from(String.format("%s <%s>", "No Reply VTSign", from))
                 .to(user.getEmail())
-                .htmlTemplate(new Mail.HtmlTemplate("email_activation", properties))
+                .htmlTemplate(new HtmlTemplate("email_activation", properties))
                 .subject("[VTSign] Activation Account")
                 .build();
         emailSenderService.sendEmail(mail);

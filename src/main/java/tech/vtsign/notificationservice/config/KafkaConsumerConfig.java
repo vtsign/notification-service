@@ -26,7 +26,7 @@ public class KafkaConsumerConfig {
         Map<String, Object> configs = new HashMap<>();
 
         configs.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "vtsign.tech:9092");
-        configs.put(ConsumerConfig.GROUP_ID_CONFIG, "group_id");
+        configs.put(ConsumerConfig.GROUP_ID_CONFIG, "group_one");
         configs.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         configs.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
         configs.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
