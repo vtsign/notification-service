@@ -1,7 +1,8 @@
 package tech.vtsign.notificationservice.service.impl;
 
-import lombok.RequiredArgsConstructor;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.MessageHeaders;
@@ -11,28 +12,42 @@ import org.springframework.stereotype.Service;
 import tech.vtsign.notificationservice.model.HtmlTemplate;
 import tech.vtsign.notificationservice.model.Mail;
 import tech.vtsign.notificationservice.model.User;
-import tech.vtsign.notificationservice.service.ConsumerService;
+import tech.vtsign.notificationservice.service.UserConsumerService;
 
 import javax.mail.MessagingException;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
-public class ConsumerServiceImpl implements ConsumerService {
+public class UserConsumerServiceImpl implements UserConsumerService {
 
     private final EmailSenderServiceImpl emailSenderService;
 
     @Value("${spring.mail.username}")
     private String from;
 
-    @KafkaListener(topics = "final-topic", groupId = "group_one", containerFactory = "kafkaListenerContainerFactory")
+    @Value("${tech.vtsign.hostname}")
+    private String hostname;
+
+//    @Value("${tech.vtsign.kafka.user-service.register}")
+//    private final String userServiceRegister = "";
+
+    public UserConsumerServiceImpl(EmailSenderServiceImpl emailSenderService) {
+        this.emailSenderService = emailSenderService;
+    }
+
+    @KafkaListener(topics = "user-service-register", containerFactory = "kafkaListenerContainerFactoryUser")
     @Override
-    public void consumeUserMessage(@Payload User user, @Headers MessageHeaders headers) throws MessagingException {
+    public void consumeMessage(@Payload Object object, @Headers MessageHeaders headers) throws IOException, MessagingException {
+        ConsumerRecord consumerRecord = (ConsumerRecord) object;
+        final ObjectMapper mapper = new ObjectMapper();
+        User user = mapper.convertValue(consumerRecord.value(), User.class);
+
         Map<String, Object> properties = new HashMap<>();
-        properties.put("activationLink", String.format("https://vtsign.tech/activation/%s", user.getId()));
+        properties.put("activationLink", String.format("%s/activation/%s", hostname, user.getId()));
         Mail mail = Mail.builder()
                 .from(String.format("%s <%s>", "No Reply VTSign", from))
                 .to(user.getEmail())
