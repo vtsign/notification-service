@@ -32,20 +32,17 @@ public class UserConsumerServiceImpl implements UserConsumerService {
     @Value("${tech.vtsign.hostname}")
     private String hostname;
 
-//    @Value("${tech.vtsign.kafka.user-service.register}")
-//    private final String userServiceRegister = "";
-
     public UserConsumerServiceImpl(EmailSenderServiceImpl emailSenderService) {
         this.emailSenderService = emailSenderService;
     }
 
-    @KafkaListener(topics = "user-service-register", containerFactory = "kafkaListenerContainerFactoryUser")
+    @KafkaListener(topics = "${tech.vtsign.kafka.user-service.register}")
     @Override
     public void consumeMessage(@Payload Object object, @Headers MessageHeaders headers) throws IOException, MessagingException {
         ConsumerRecord consumerRecord = (ConsumerRecord) object;
         final ObjectMapper mapper = new ObjectMapper();
         User user = mapper.convertValue(consumerRecord.value(), User.class);
-
+        log.info("==== Receive message register from user-service {}", user);
         Map<String, Object> properties = new HashMap<>();
         properties.put("activationLink", String.format("%s/activation/%s", hostname, user.getId()));
         Mail mail = Mail.builder()

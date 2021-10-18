@@ -30,21 +30,17 @@ public class DocumentConsumerServiceImpl implements DocumentConsumerService {
     @Value("${tech.vtsign.hostname}")
     private String hostname;
 
-//    @Value("${tech.vtsign.kafka.document-service.notify-sign}")
-//    private final String documentServiceNotifySign;
-
-
     public DocumentConsumerServiceImpl(EmailSenderServiceImpl emailSenderService) {
         this.emailSenderService = emailSenderService;
     }
 
-    @KafkaListener(topics = "document-service-notify-sign", containerFactory = "kafkaListenerContainerFactoryUser")
+    @KafkaListener(topics = "${tech.vtsign.kafka.document-service.notify-sign}")
     @Override
     public void consumeMessage(@Payload Object object, @Headers MessageHeaders headers) throws IOException, MessagingException {
         ConsumerRecord consumerRecord = (ConsumerRecord) object;
         final ObjectMapper mapper = new ObjectMapper();
         InfoMailReceiver infoMailReceiver = mapper.convertValue(consumerRecord.value(), InfoMailReceiver.class);
-        log.info("===================Receive from document {}", infoMailReceiver);
+        log.info("==== Receive from document {}", infoMailReceiver);
         Map<String, Object> properties = new HashMap<>();
         properties.put("signLink", infoMailReceiver.getUrl());
         properties.put("nameSender", infoMailReceiver.getNameSender());
