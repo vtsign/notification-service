@@ -43,12 +43,15 @@ public class DocumentConsumerServiceImpl implements DocumentConsumerService {
         log.info("==== Receive from document {}", infoMailReceiver);
         Map<String, Object> properties = new HashMap<>();
         properties.put("signLink", infoMailReceiver.getUrl());
-        properties.put("nameSender", infoMailReceiver.getNameSender());
+        properties.put("senderName", infoMailReceiver.getSenderName());
+        properties.put("mailMessage", infoMailReceiver.getMailMessage());
+        properties.put("name", infoMailReceiver.getName());
+        properties.put("privateMessage", infoMailReceiver.getPrivateMessage());
         Mail mail = Mail.builder()
-                .from(String.format("%s via VTSign <%s>", infoMailReceiver.getNameSender(), from))
+                .from(String.format("%s via VTSign <%s>", infoMailReceiver.getSenderName(), from))
                 .to(infoMailReceiver.getEmail())
-                .htmlTemplate(new HtmlTemplate("email_launch", properties))
-                .subject("[VTSign] Sign Document")
+                .htmlTemplate(new HtmlTemplate("email_sign", properties))
+                .subject(String.format("[VTSign] Sign Document - %s", infoMailReceiver.getMailTitle()))
                 .build();
         emailSenderService.sendEmail(mail);
     }

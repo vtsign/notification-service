@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <title>VTSign - Welcome</title>
+    <title>VTSign - Sign document</title>
     <meta name="viewport" content="width=device-width"/>
     <style type="text/css">
         @media only screen and (max-width: 550px), screen and (max-device-width: 550px) {
@@ -52,7 +52,7 @@
     <tr>
         <td align="center" bgcolor="#ffffff"
             style="padding: 40px 20px 40px 20px; color: #555555; font-family: Arial, sans-serif; font-size: 20px; line-height: 30px; border-bottom: 1px solid #f6f6f6;">
-            <b>[[${nameSender}]] đã gửi một tài liệu cho bạn.</b>
+            <b>[[${senderName}]] đã gửi một tài liệu cho bạn.</b>
         </td>
     </tr>
     <tr>
@@ -68,6 +68,26 @@
                             </td>
                         </tr>
                     </table>
+                </td>
+            </tr>
+            <tr>
+                <td bgcolor="#ffffff" style="padding: 30px 20px 10px 20px; color: #555555; font-family: Arial, sans-serif; font-size: 20px; line-height: 30px;">
+                    Lời nhắn
+                </td>
+            </tr>
+            <tr>
+                <td bgcolor="#ffffff" style="padding: 10px 20px 20px 20px; color: #555555; font-family: Arial, sans-serif; font-size: 15px; line-height: 24px; border-bottom: 1px solid #f6f6f6;">
+                    [[${mailMessage}]]
+                </td>
+            </tr>
+            <tr th:if="${privateMessage}">
+                <td bgcolor="#ffffff" style="padding: 30px 20px 10px 20px; color: #555555; font-family: Arial, sans-serif; font-size: 20px; line-height: 30px;">
+                    Tin nhắn riêng tư mà [[${senderName}]] gửi cho bạn
+                </td>
+            </tr>
+            <tr th:if="${privateMessage}">
+                <td bgcolor="#ffffff" style="padding: 10px 20px 20px 20px; color: #555555; font-family: Arial, sans-serif; font-size: 15px; line-height: 24px; border-bottom: 1px solid #f6f6f6;">
+                    [[${privateMessage}]]
                 </td>
             </tr>
             <tr>
@@ -109,7 +129,7 @@
             </tr>
             <tr>
                 <td bgcolor="#ffffff" style="padding: 10px 20px 20px 20px; color: #555555; font-family: Arial, sans-serif; font-size: 15px; line-height: 24px; border-bottom: 1px solid #f6f6f6;">
-                    Thư này đã được gửi cho bạn từ [[${nameSender}]], người đang sử dụng Dịch vụ Chữ ký Điện tử VTSign.
+                    Thư này đã được gửi cho bạn từ [[${senderName}]], người đang sử dụng Dịch vụ Chữ ký Điện tử VTSign.
                     Nếu bạn không muốn nhận email từ người gửi này, bạn có thể liên hệ với người gửi cùng với yêu cầu
                     của bạn.
                 </td>
