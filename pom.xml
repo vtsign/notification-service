@@ -72,6 +72,13 @@
             <artifactId>springdoc-openapi-webmvc-core</artifactId>
             <version>1.5.11</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/com.twilio.sdk/twilio -->
+        <dependency>
+            <groupId>com.twilio.sdk</groupId>
+            <artifactId>twilio</artifactId>
+            <version>8.22.0</version>
+<!--            <scope>runtime</scope>-->
+        </dependency>
     </dependencies>
     <dependencyManagement>
         <dependencies>
