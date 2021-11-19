@@ -9,4 +9,7 @@ import java.io.IOException;
 
 public interface DocumentConsumerService {
     void consumeMessage(@Payload Object object, @Headers MessageHeaders headers) throws IOException, MessagingException;
+
+    void consumeMessageCommon(@Payload Object object, @Headers MessageHeaders headers)
+            throws IOException, MessagingException;
 }

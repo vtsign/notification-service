@@ -2,16 +2,19 @@ package tech.vtsign.notificationservice.service.impl;
 
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.InputStreamSource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
+import tech.vtsign.notificationservice.model.Attachment;
 import tech.vtsign.notificationservice.model.Mail;
 import tech.vtsign.notificationservice.service.EmailSenderService;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 @Service
@@ -34,7 +37,19 @@ public class EmailSenderServiceImpl implements EmailSenderService {
         helper.setFrom(mail.getFrom());
         helper.setSubject(mail.getSubject());
         helper.setText(html, true);
-
+        if (mail.getAttachments() != null) {
+            for (Attachment attachment : mail.getAttachments()) {
+                String url = attachment.getUrl();
+                InputStreamSource inputStreamSource = () -> {
+                    try {
+                        return new URL(url).openStream();
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                };
+                helper.addAttachment(attachment.getName(), inputStreamSource);
+            }
+        }
         emailSender.send(message);
     }
 

@@ -48,7 +48,7 @@ public class UserConsumerServiceImpl implements UserConsumerService {
         Mail mail = Mail.builder()
                 .from(String.format("%s <%s>", "No Reply VTSign", from))
                 .to(user.getEmail())
-                .htmlTemplate(new HtmlTemplate("email_activation", properties))
+                .htmlTemplate(new HtmlTemplate("activation", properties))
                 .subject("[VTSign] Activation Account")
                 .build();
         emailSenderService.sendEmail(mail);

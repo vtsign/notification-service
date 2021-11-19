@@ -16,8 +16,9 @@ public class ThymeLeafTemplateConfig {
         templateEngine.addTemplateResolver(htmlTemplateResolver());
         return templateEngine;
     }
+
     @Bean
-    public ClassLoaderTemplateResolver htmlTemplateResolver(){
+    public ClassLoaderTemplateResolver htmlTemplateResolver() {
         ClassLoaderTemplateResolver emailTemplateResolver = new ClassLoaderTemplateResolver();
         emailTemplateResolver.setPrefix("/email/");
         emailTemplateResolver.setSuffix(".html");

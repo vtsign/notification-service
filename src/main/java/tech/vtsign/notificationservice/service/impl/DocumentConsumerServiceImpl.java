@@ -10,10 +10,7 @@ import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.handler.annotation.Headers;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
-import tech.vtsign.notificationservice.model.HtmlTemplate;
-import tech.vtsign.notificationservice.model.Mail;
-import tech.vtsign.notificationservice.model.Receiver;
-import tech.vtsign.notificationservice.model.ReceiverContract;
+import tech.vtsign.notificationservice.model.*;
 import tech.vtsign.notificationservice.service.DocumentConsumerService;
 import tech.vtsign.notificationservice.service.EmailSenderService;
 import tech.vtsign.notificationservice.service.SMSSenderService;
@@ -55,7 +52,7 @@ public class DocumentConsumerServiceImpl implements DocumentConsumerService {
         Mail mail = Mail.builder()
                 .from(String.format("%s via VTSign <%s>", receiverContract.getSenderName(), from))
                 .to(receiver.getEmail())
-                .htmlTemplate(new HtmlTemplate("email_sign", properties))
+                .htmlTemplate(new HtmlTemplate("invite_sign", properties))
                 .subject(String.format("[VTSign] Sign Document - %s", receiverContract.getMailTitle()))
                 .build();
 
@@ -63,5 +60,26 @@ public class DocumentConsumerServiceImpl implements DocumentConsumerService {
         smsSenderService.sendSMS(receiver.getPhone(),
                 String.format("%s da moi ban ky mot tai lieu \"%s\" ma bao mat: %s", receiverContract.getSenderName(),
                         receiverContract.getMailTitle(), receiver.getKey()));
+    }
+
+    @KafkaListener(topics = "${tech.vtsign.kafka.document-service.notify-common}")
+    @Override
+    public void consumeMessageCommon(@Payload Object object, @Headers MessageHeaders headers)
+            throws IOException, MessagingException {
+        ConsumerRecord consumerRecord = (ConsumerRecord) object;
+        final ObjectMapper mapper = new ObjectMapper();
+        DocumentCommonMessage documentCommonMessage = mapper.convertValue(consumerRecord.value(), DocumentCommonMessage.class);
+        log.info("==== Receive from document {}", documentCommonMessage);
+
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("message", documentCommonMessage.getMessage());
+        Mail mail = Mail.builder()
+                .from(String.format("%s <%s>", "No Reply VTSign", from))
+                .to(documentCommonMessage.getTo())
+                .htmlTemplate(new HtmlTemplate("notify_common", properties))
+                .subject(String.format("[VTSign] Contract - %s", documentCommonMessage.getTitle()))
+                .attachments(documentCommonMessage.getAttachments())
+                .build();
+        emailSenderService.sendEmail(mail);
     }
 }
