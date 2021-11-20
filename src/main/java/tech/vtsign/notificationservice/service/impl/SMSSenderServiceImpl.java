@@ -24,9 +24,9 @@ public class SMSSenderServiceImpl implements SMSSenderService {
         Twilio.init(accountSid, authToken);
         try {
             Message message = Message.creator(
-                            new PhoneNumber(to),
-                            messagingServiceSid,
-                            content)
+                    new PhoneNumber(to),
+                    messagingServiceSid,
+                    content)
                     .create();
             log.info("Message sent to {}: {}", to, message.getSid());
             return true;
