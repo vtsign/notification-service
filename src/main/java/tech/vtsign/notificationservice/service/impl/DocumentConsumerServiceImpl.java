@@ -17,6 +17,8 @@ import tech.vtsign.notificationservice.service.SMSSenderService;
 
 import javax.mail.MessagingException;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,13 +55,14 @@ public class DocumentConsumerServiceImpl implements DocumentConsumerService {
                 .from(String.format("%s via VTSign <%s>", receiverContract.getSenderName(), from))
                 .to(receiver.getEmail())
                 .htmlTemplate(new HtmlTemplate("invite_sign", properties))
-                .subject(String.format("[VTSign] Sign Document - %s", receiverContract.getMailTitle()))
+                .subject(String.format("[VTSign] Sign Contract - %s", receiverContract.getMailTitle()))
                 .build();
 
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss dd-MM-yyyy");
         emailSenderService.sendEmail(mail);
         smsSenderService.sendSMS(receiver.getPhone(),
-                String.format("%s da moi ban ky mot tai lieu \"%s\" ma bao mat: %s", receiverContract.getSenderName(),
-                        receiverContract.getMailTitle(), receiver.getKey()));
+                String.format("%s da moi ban ky mot tai lieu \"%s\" luc %s ma bao mat: %s", receiverContract.getSenderName(),
+                        receiverContract.getMailTitle(), sdf.format(new Date()), receiver.getKey()));
     }
 
     @KafkaListener(topics = "${tech.vtsign.kafka.document-service.notify-common}")
