@@ -61,8 +61,8 @@ public class DocumentConsumerServiceImpl implements DocumentConsumerService {
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss dd-MM-yyyy");
         emailSenderService.sendEmail(mail);
         smsSenderService.sendSMS(receiver.getPhone(),
-                String.format("%s da moi ban ky mot tai lieu \"%s\" luc %s ma bao mat: %s", receiverContract.getSenderName(),
-                        receiverContract.getMailTitle(), sdf.format(new Date()), receiver.getKey()));
+                String.format("%s da moi ban ky mot tai lieu \"%s\" luc %s (UTC) ma bao mat: %s", receiverContract.getSenderName(),
+                        receiverContract.getMailTitle(), sdf.format(receiverContract.getCreatedDate()), receiver.getKey()));
     }
 
     @KafkaListener(topics = "${tech.vtsign.kafka.document-service.notify-common}")
