@@ -18,7 +18,6 @@ import tech.vtsign.notificationservice.service.SMSSenderService;
 import javax.mail.MessagingException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,9 +30,6 @@ public class DocumentConsumerServiceImpl implements DocumentConsumerService {
 
     @Value("${spring.mail.username}")
     private String from;
-
-    @Value("${tech.vtsign.hostname}")
-    private String hostname;
 
     @KafkaListener(topics = "${tech.vtsign.kafka.document-service.notify-sign}")
     @Override
