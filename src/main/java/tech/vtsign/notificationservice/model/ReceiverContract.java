@@ -3,7 +3,8 @@ package tech.vtsign.notificationservice.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.util.Date;
+
+import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
