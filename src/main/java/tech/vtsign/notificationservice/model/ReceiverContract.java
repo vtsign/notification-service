@@ -11,7 +11,7 @@ import java.util.Date;
 public class ReceiverContract {
     private Receiver receiver;
 
-    private Date createdDate;
+    private LocalDateTime createdDate;
     private String mailMessage;
     private String mailTitle;
     private String url;
