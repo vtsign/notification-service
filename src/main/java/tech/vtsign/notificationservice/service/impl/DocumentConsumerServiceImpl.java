@@ -17,7 +17,8 @@ import tech.vtsign.notificationservice.service.SMSSenderService;
 
 import javax.mail.MessagingException;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,6 +28,7 @@ import java.util.Map;
 public class DocumentConsumerServiceImpl implements DocumentConsumerService {
     private final EmailSenderService emailSenderService;
     private final SMSSenderService smsSenderService;
+    private final ObjectMapper objectMapper;
 
     @Value("${spring.mail.username}")
     private String from;
@@ -36,8 +38,7 @@ public class DocumentConsumerServiceImpl implements DocumentConsumerService {
     public void consumeMessage(@Payload Object object, @Headers MessageHeaders headers)
             throws IOException, MessagingException {
         ConsumerRecord consumerRecord = (ConsumerRecord) object;
-        final ObjectMapper mapper = new ObjectMapper();
-        ReceiverContract receiverContract = mapper.convertValue(consumerRecord.value(), ReceiverContract.class);
+        ReceiverContract receiverContract = objectMapper.convertValue(consumerRecord.value(), ReceiverContract.class);
         log.info("==== Receive from document {}", receiverContract);
         Receiver receiver = receiverContract.getReceiver();
 
@@ -54,11 +55,13 @@ public class DocumentConsumerServiceImpl implements DocumentConsumerService {
                 .subject(String.format("[VTSign] Sign Contract - %s", receiverContract.getMailTitle()))
                 .build();
 
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss dd-MM-yyyy");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss dd-MM-yyyy");
+        LocalDateTime dateTime = receiverContract.getCreatedDate() != null
+                ? receiverContract.getCreatedDate() : LocalDateTime.now();
         emailSenderService.sendEmail(mail);
         smsSenderService.sendSMS(receiver.getPhone(),
                 String.format("%s da moi ban ky mot tai lieu \"%s\" luc %s (UTC) ma bao mat: %s", receiverContract.getSenderName(),
-                        receiverContract.getMailTitle(), sdf.format(receiverContract.getCreatedDate()), receiver.getKey()));
+                        receiverContract.getMailTitle(), dateTime.format(formatter), receiver.getKey()));
     }
 
     @KafkaListener(topics = "${tech.vtsign.kafka.document-service.notify-common}")

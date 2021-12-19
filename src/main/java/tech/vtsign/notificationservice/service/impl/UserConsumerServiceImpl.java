@@ -1,6 +1,7 @@
 package tech.vtsign.notificationservice.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,23 +23,20 @@ import java.util.Map;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class UserConsumerServiceImpl implements UserConsumerService {
 
     private final EmailSenderServiceImpl emailSenderService;
+    private final ObjectMapper objectMapper;
 
     @Value("${spring.mail.username}")
     private String from;
-
-    public UserConsumerServiceImpl(EmailSenderServiceImpl emailSenderService) {
-        this.emailSenderService = emailSenderService;
-    }
 
     @KafkaListener(topics = "${tech.vtsign.kafka.user-service.register}")
     @Override
     public void consumeMessage(@Payload Object object, @Headers MessageHeaders headers) throws IOException, MessagingException {
         ConsumerRecord consumerRecord = (ConsumerRecord) object;
-        final ObjectMapper mapper = new ObjectMapper();
-        Activation activation = mapper.convertValue(consumerRecord.value(), Activation.class);
+        Activation activation = objectMapper.convertValue(consumerRecord.value(), Activation.class);
         log.info("==== Receive message register from user-service {}", activation);
         Map<String, Object> properties = new HashMap<>();
 //        properties.put("activationLink", String.format("%s/activation/%s", hostname, user.getId()));
