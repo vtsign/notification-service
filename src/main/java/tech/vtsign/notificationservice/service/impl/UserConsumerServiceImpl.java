@@ -13,10 +13,12 @@ import org.springframework.stereotype.Service;
 import tech.vtsign.notificationservice.model.Activation;
 import tech.vtsign.notificationservice.model.HtmlTemplate;
 import tech.vtsign.notificationservice.model.Mail;
+import tech.vtsign.notificationservice.model.ResetPasswordTransfer;
 import tech.vtsign.notificationservice.service.UserConsumerService;
 
 import javax.mail.MessagingException;
 import java.io.IOException;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,4 +52,23 @@ public class UserConsumerServiceImpl implements UserConsumerService {
         emailSenderService.sendEmail(mail);
     }
 
+    @KafkaListener(topics = "${tech.vtsign.kafka.user-service.reset-password}")
+    @Override
+    public void consumeMessageReset(Object object, MessageHeaders headers) throws IOException, MessagingException {
+        ConsumerRecord consumerRecord = (ConsumerRecord) object;
+        ResetPasswordTransfer resetPasswordTransfer = objectMapper.convertValue(consumerRecord.value(), ResetPasswordTransfer.class);
+        log.info("==== Receive message register from user-service {}", resetPasswordTransfer);
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("link", resetPasswordTransfer.getUrl());
+        properties.put("email", resetPasswordTransfer.getTo());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss dd-MM-yyyy");
+        properties.put("expiredAt", resetPasswordTransfer.getExpireAt().format(formatter));
+        Mail mail = Mail.builder()
+                .from(String.format("%s <%s>", "No Reply VTSign", from))
+                .to(resetPasswordTransfer.getTo())
+                .htmlTemplate(new HtmlTemplate("reset_password", properties))
+                .subject("[VTSign] Reset Password")
+                .build();
+        emailSenderService.sendEmail(mail);
+    }
 }
