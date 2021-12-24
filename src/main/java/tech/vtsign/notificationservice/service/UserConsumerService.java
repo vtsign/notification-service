@@ -11,4 +11,6 @@ public interface UserConsumerService {
     void consumeMessage(@Payload Object object, @Headers MessageHeaders headers) throws IOException, MessagingException;
 
     void consumeMessageReset(@Payload Object object, @Headers MessageHeaders headers) throws IOException, MessagingException;
+
+    void consumeMessageCommon(@Payload Object object, @Headers MessageHeaders headers) throws IOException, MessagingException;
 }

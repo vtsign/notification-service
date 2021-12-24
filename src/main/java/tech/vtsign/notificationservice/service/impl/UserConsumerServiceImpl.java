@@ -10,10 +10,7 @@ import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.handler.annotation.Headers;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
-import tech.vtsign.notificationservice.model.Activation;
-import tech.vtsign.notificationservice.model.HtmlTemplate;
-import tech.vtsign.notificationservice.model.Mail;
-import tech.vtsign.notificationservice.model.ResetPasswordTransfer;
+import tech.vtsign.notificationservice.model.*;
 import tech.vtsign.notificationservice.service.UserConsumerService;
 
 import javax.mail.MessagingException;
@@ -68,6 +65,27 @@ public class UserConsumerServiceImpl implements UserConsumerService {
                 .to(resetPasswordTransfer.getTo())
                 .htmlTemplate(new HtmlTemplate("reset_password", properties))
                 .subject("[VTSign] Reset Password")
+                .build();
+        emailSenderService.sendEmail(mail);
+    }
+
+    @KafkaListener(topics = "${tech.vtsign.kafka.user-service.notify-common}")
+    @Override
+    public void consumeMessageCommon(@Payload Object object, @Headers MessageHeaders headers)
+            throws IOException, MessagingException {
+        ConsumerRecord consumerRecord = (ConsumerRecord) object;
+        final ObjectMapper mapper = new ObjectMapper();
+        CommonMessage commonMessage = mapper.convertValue(consumerRecord.value(), CommonMessage.class);
+        log.info("==== Receive from user-service {}", commonMessage);
+
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("message", commonMessage.getMessage());
+        Mail mail = Mail.builder()
+                .from(String.format("%s <%s>", "No Reply VTSign", from))
+                .to(commonMessage.getTo())
+                .htmlTemplate(new HtmlTemplate("notify_common", properties))
+                .subject(String.format("[VTSign] Notification - %s", commonMessage.getTitle()))
+                .attachments(commonMessage.getAttachments())
                 .build();
         emailSenderService.sendEmail(mail);
     }

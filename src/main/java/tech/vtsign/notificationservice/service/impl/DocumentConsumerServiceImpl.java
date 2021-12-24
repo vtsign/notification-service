@@ -70,17 +70,17 @@ public class DocumentConsumerServiceImpl implements DocumentConsumerService {
             throws IOException, MessagingException {
         ConsumerRecord consumerRecord = (ConsumerRecord) object;
         final ObjectMapper mapper = new ObjectMapper();
-        DocumentCommonMessage documentCommonMessage = mapper.convertValue(consumerRecord.value(), DocumentCommonMessage.class);
-        log.info("==== Receive from document {}", documentCommonMessage);
+        CommonMessage commonMessage = mapper.convertValue(consumerRecord.value(), CommonMessage.class);
+        log.info("==== Receive from document {}", commonMessage);
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put("message", documentCommonMessage.getMessage());
+        properties.put("message", commonMessage.getMessage());
         Mail mail = Mail.builder()
                 .from(String.format("%s <%s>", "No Reply VTSign", from))
-                .to(documentCommonMessage.getTo())
+                .to(commonMessage.getTo())
                 .htmlTemplate(new HtmlTemplate("notify_common", properties))
-                .subject(String.format("[VTSign] Contract - %s", documentCommonMessage.getTitle()))
-                .attachments(documentCommonMessage.getAttachments())
+                .subject(String.format("[VTSign] Contract - %s", commonMessage.getTitle()))
+                .attachments(commonMessage.getAttachments())
                 .build();
         emailSenderService.sendEmail(mail);
     }
