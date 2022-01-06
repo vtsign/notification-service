@@ -5,16 +5,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.MessageHeaders;
-import org.springframework.messaging.handler.annotation.Headers;
-import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
 import tech.vtsign.notificationservice.model.*;
 import tech.vtsign.notificationservice.service.UserConsumerService;
 
 import javax.mail.MessagingException;
-import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,14 +27,13 @@ public class UserConsumerServiceImpl implements UserConsumerService {
     @Value("${spring.mail.username}")
     private String from;
 
-    @KafkaListener(topics = "${tech.vtsign.kafka.user-service.register}")
     @Override
-    public void consumeMessage(@Payload Object object, @Headers MessageHeaders headers) throws IOException, MessagingException {
+    public void consumeMessageRegister(Object object, MessageHeaders headers)
+            throws MessagingException {
         ConsumerRecord consumerRecord = (ConsumerRecord) object;
         Activation activation = objectMapper.convertValue(consumerRecord.value(), Activation.class);
         log.info("==== Receive message register from user-service {}", activation);
         Map<String, Object> properties = new HashMap<>();
-//        properties.put("activationLink", String.format("%s/activation/%s", hostname, user.getId()));
         properties.put("activationLink", activation.getUrl());
         Mail mail = Mail.builder()
                 .from(String.format("%s <%s>", "No Reply VTSign", from))
@@ -49,12 +44,12 @@ public class UserConsumerServiceImpl implements UserConsumerService {
         emailSenderService.sendEmail(mail);
     }
 
-    @KafkaListener(topics = "${tech.vtsign.kafka.user-service.reset-password}")
     @Override
-    public void consumeMessageReset(Object object, MessageHeaders headers) throws IOException, MessagingException {
+    public void consumeMessageReset(Object object, MessageHeaders headers)
+            throws MessagingException {
         ConsumerRecord consumerRecord = (ConsumerRecord) object;
         ResetPasswordTransfer resetPasswordTransfer = objectMapper.convertValue(consumerRecord.value(), ResetPasswordTransfer.class);
-        log.info("==== Receive message register from user-service {}", resetPasswordTransfer);
+        log.info("==== Receive message reset password from user-service {}", resetPasswordTransfer);
         Map<String, Object> properties = new HashMap<>();
         properties.put("link", resetPasswordTransfer.getUrl());
         properties.put("email", resetPasswordTransfer.getTo());
@@ -69,14 +64,13 @@ public class UserConsumerServiceImpl implements UserConsumerService {
         emailSenderService.sendEmail(mail);
     }
 
-    @KafkaListener(topics = "${tech.vtsign.kafka.user-service.notify-common}")
     @Override
-    public void consumeMessageCommon(@Payload Object object, @Headers MessageHeaders headers)
-            throws IOException, MessagingException {
+    public void consumeMessageCommon(Object object, MessageHeaders headers)
+            throws MessagingException {
         ConsumerRecord consumerRecord = (ConsumerRecord) object;
         final ObjectMapper mapper = new ObjectMapper();
         CommonMessage commonMessage = mapper.convertValue(consumerRecord.value(), CommonMessage.class);
-        log.info("==== Receive from user-service {}", commonMessage);
+        log.info("==== Receive from common message user-service {}", commonMessage);
 
         Map<String, Object> properties = new HashMap<>();
         properties.put("message", commonMessage.getMessage());
